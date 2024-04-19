@@ -4,14 +4,17 @@ import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @AllArgsConstructor
@@ -27,6 +30,15 @@ public class GroupController {
         groupService.saveGroup(groupDTO);
         return groupDTO;
     }
+    @DeleteMapping("/groups/{groupid}")
+    public ResponseEntity<String> deleteGroup(@PathVariable("groupid") String groupId, @RequestBody Map<String, String> user) {
+            System.out.println("hihi"+groupId + " " + user.get("name"));
+            groupService.deleteGroup(groupId,user.get("name"));
+            return ResponseEntity.ok("Group deleted successfully");
+    
+    }
+
+
     
     
 }

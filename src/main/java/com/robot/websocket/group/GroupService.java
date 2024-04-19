@@ -2,17 +2,35 @@ package com.robot.websocket.group;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.robot.websocket.user.User;
+import com.robot.websocket.user.UserRepository;
+
 @Service
 @RequiredArgsConstructor
 public class GroupService {
-
+    private final UserRepository UserRepository;
     private final GroupRepository groupRepository;
 
-    public Group saveGroup(Group group) {
+    public Group saveGroup(GroupDTO groupDTO) {
+        Group group = new Group();
+        group.setName(groupDTO.getName());
+        group.setCreator(groupDTO.getCreator());
+        group.setUsers(groupDTO.getUsers());
+        group.setId(groupDTO.getName() + groupDTO.getCreator() + System.currentTimeMillis());
+        final List<String> admins = new ArrayList<String>();
+        admins.add(groupDTO.getCreator());
+        group.setAdmins(admins);
+        group.setCreatedDate(new java.sql.Date(System.currentTimeMillis()));
+        System.out.println(group);
+        for (String user : groupDTO.getUsers()) {
+            User user1 = UserRepository.findByNickName(user);
+            user1.addGroup(group.getId());
+        }
         return groupRepository.save(group);
     }
     public List<Group> findallgroupsofnickname(String nickname) {

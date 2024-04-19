@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.sql.Date;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -18,7 +19,9 @@ import jakarta.persistence.Table;
 public class Group {
     @Id
     private String id;
-
     private String name;
     private List<String> users;
+    private String creator;
+    private List<String> admins;
+    private Date createdDate;
 }

@@ -7,6 +7,10 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import com.robot.websocket.group.Group;
+import com.robot.websocket.group.GroupService;
 
 import java.util.List;
 
@@ -15,6 +19,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final GroupService groupService;
 
     @MessageMapping("/user.addUser")
     @SendTo("/user/public")
@@ -37,5 +42,11 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<List<User>> findConnectedUsers() {
         return ResponseEntity.ok(userService.findAllUsers());
+    }
+
+    @GetMapping("/user/{nickname}/groups")
+    public ResponseEntity<List<Group>> getGroupsByNickname(@PathVariable String nickname) { 
+        List<Group> groups = groupService.findallgroupsofnickname(nickname);
+        return ResponseEntity.ok(groups);
     }
 }

@@ -2,6 +2,7 @@ package com.robot.websocket.group;
 
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -18,16 +19,14 @@ public class GroupController {
 
     private final GroupService groupService;
 
-    @MessageMapping("/group.addgroup")
+    @MessageMapping("/group.groups")
     @SendTo("/user/public")
-    public Group addGroup(@Payload Group group) {
-        groupService.saveGroup(group);
-        return group;
+    public GroupDTO addGroup(@Payload GroupDTO groupDTO) {
+        System.out.println("papapa: " + groupDTO);
+        
+        groupService.saveGroup(groupDTO);
+        return groupDTO;
     }
-    @GetMapping("/groups/{nickname}")
-    public ResponseEntity<List<Group>> getGroupsByNickname(@PathVariable String nickname) { 
-        List<Group> groups = groupService.findallgroupsofnickname(nickname);
-        return ResponseEntity.ok(groups);
-    }
+    
     
 }

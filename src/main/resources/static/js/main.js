@@ -92,7 +92,7 @@ async function onMessageReceived(payload) {
 
     
     async function findAndDisplayAllGroups() {
-        const response = await fetch(`/groups/${nickname}`);
+        const response = await fetch(`/user/${nickname}/groups`);
         const groups = await response.json();
         const groupList = document.getElementById('AllUsers');
 
@@ -364,13 +364,13 @@ function onSubmitGroupForm(event) {
     // Create a payload object with the group name and selected user IDs
     
     const groupPayload = {
-        id:`${nickname}_${new Date().getTime()}`,
         name: groupName,
+        creator:`${nickname}`,
         users: checkedUssers
     };
 
     // Send the group payload to the server
-    stompClient.send("/app/group.addgroup", {}, JSON.stringify(groupPayload));
+    stompClient.send("/app/group.groups", {}, JSON.stringify(groupPayload));
         // Optionally, display a message indicating that the group has been created
 
         // Clear the group name input and checked users list

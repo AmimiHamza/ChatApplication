@@ -14,6 +14,10 @@ const logout = document.querySelector('#logout');
 const onlinedot = document.createElement('H1');
 const NewGroupButton = document.querySelector('#NewGroupButton');
 const newGroupForm = document.querySelector('#NewGroupForm');
+const chatname= document.querySelector('#chat-name');
+const chatnamedisplay= document.querySelector('#chat-name-display');
+
+const deletegroupbutton = document.querySelector('#deletegroupbutton');//to add
 let checkedUssers = [];
 
 let stompClient = null;
@@ -65,7 +69,8 @@ async function onMessageReceived(payload) {
         document.querySelector(`#${selectedUserId}`).classList.add('active');
     } else {
         messageForm.classList.add('hidden');
-    }
+        chatname.classList.add('hidden');
+   }
 
 
     if (selectedUserId && selectedUserId === message.senderId && nickname===message.recipientId) {
@@ -132,7 +137,13 @@ async function onMessageReceived(payload) {
             item.classList.remove('active');
         });
         messageForm.classList.remove('hidden');
+        chatname.classList.remove('hidden');
+        chatnamedisplay.textContent=event.currentTarget.id;
+        console.log(event.currentTarget)
+        deletegroupbutton.classList.remove('hidden');
+
         messageForm.setAttribute('id', 'group_message_form');
+        console.log("hi",deletegroupbutton.id);
 
 
         const clickedUser = event.currentTarget;
@@ -224,6 +235,11 @@ function userItemClick(event) {
         item.classList.remove('active');
     });
     messageForm.classList.remove('hidden');
+
+    chatname.classList.remove('hidden');
+    chatnamedisplay.textContent=event.currentTarget.id;
+    deletegroupbutton.classList.add('hidden');
+
     messageForm.setAttribute('id', 'user_message_form');
 
     const clickedUser = event.currentTarget;
@@ -324,6 +340,35 @@ async function createGroup(event) {
     await findAndDisplayAllUsers('NewGroupList',userItemClickGroup);
 
 }
+
+deletegroupbutton.addEventListener('click', deleteGroup, true);
+
+async function deleteGroup(event) {
+    let groupid=chatnamedisplay.innerHTML;
+    console.log("nickname",nickname);
+
+    const groupPayload = {name: nickname};
+    fetch(`/groups/${groupid}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(groupPayload)
+    })
+
+            .then(() => {
+                console.log("Group deleted");
+            });
+        ;
+    event.preventDefault();
+        const groupList = document.getElementById('AllUsers');
+        groupList.innerHTML = '';
+        await findAndDisplayAllUsers('AllUsers',userItemClick);
+        await findAndDisplayAllGroups();
+        chatArea.classList.add('hidden');
+
+}
+
 
 function userItemClickGroup(event) {
     const clickedUser = event.currentTarget;

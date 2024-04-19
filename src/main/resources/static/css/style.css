@@ -207,7 +207,27 @@ body {
 .hidden {
     display: none;
 }
+#chat-name {
+    background-color: #ccc;
+    color: grey;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 20px;
 
+}
+
+#deletegroupbutton{
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 10%;
+    margin-left: 300px;
+
+}
 a.logout {
     color: #fff;
     text-decoration: none;

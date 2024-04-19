@@ -36,4 +36,11 @@ public class GroupService {
     public List<Group> findallgroupsofnickname(String nickname) {
         return groupRepository.findAllByUser(nickname);
     }
+    public void deleteGroup(String groupId, String username) {
+        Group group = groupRepository.findById(groupId).get();
+        if (group.getCreator().equals(username)) {
+            groupRepository.delete(group);
+        }
+        throw new UnsupportedOperationException("Unimplemented method 'deleteGroup'");
+    }
 }

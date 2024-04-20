@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.robot.websocket.chat.ChatMessage;
 import com.robot.websocket.chat.ChatMessageService;
 import com.robot.websocket.user.User;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @AllArgsConstructor
@@ -27,7 +29,7 @@ public class GroupController {
     private final GroupService groupService;
     private final ChatMessageService chatMessageService;
 
-    @MessageMapping("/group.groups")
+    @MessageMapping("/groups")
     @SendTo("/user/public")
     public GroupDTO addGroup(@Payload GroupDTO groupDTO) {
         groupService.saveGroup(groupDTO);
@@ -53,5 +55,9 @@ public class GroupController {
         return ResponseEntity.ok(users);
     }
     
-    
+    @PostMapping("/groups/{groupid}/members")
+    public ResponseEntity<String> addGroupMembers(@PathVariable("groupid") String groupId, @RequestBody Map<String, List<String>>users) {
+        groupService.addGroupMembers(groupId, users.get("users"));
+        return ResponseEntity.ok("Group members added successfully");
+    }
 }

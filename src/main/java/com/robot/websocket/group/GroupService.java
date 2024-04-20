@@ -56,4 +56,15 @@ public class GroupService {
         return users;
 
     }
+    public void addGroupMembers(String groupId, List<String> users) {
+        Group group = groupRepository.findById(groupId).get();
+        for (String user : users) {
+            group.getUsers().add(user);
+            User user1 = UserRepository.findByNickName(user);
+            user1.addGroup(groupId);
+            UserRepository.save(user1);
+        }
+        groupRepository.save(group);
+        
+    }
 }

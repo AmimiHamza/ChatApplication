@@ -20,9 +20,13 @@ const chatnamedisplay= document.querySelector('#chat-name-display');
 
 const deletegroupbutton = document.querySelector('#deletegroupbutton');
 const group_members_button = document.querySelector('#group-members');
+const add_members_button = document.querySelector('#add-members');
+const add_selected_members=document.querySelector('#add-selected-members')
 const group_member_list= document.querySelector('#group-member-list');
 const member_list = document.querySelector('#member-list');
 const quit_members_button = document.querySelector('#quit-members');
+const users_list_page = document.querySelector('#users-list-page');
+// const users_to_add= document.querySelector('#users-list-page');
 let checkedUssers = [];
 
 let stompClient = null;
@@ -146,6 +150,7 @@ async function onMessageReceived(payload) {
         chatnamedisplay.textContent=event.currentTarget.id;
         deletegroupbutton.classList.remove('hidden');
         group_members_button.classList.remove('hidden');
+        add_members_button.classList.remove('hidden');
 
         messageForm.setAttribute('id', 'group_message_form');
 
@@ -246,6 +251,7 @@ function userItemClick(event) {
     chatnamedisplay.textContent=event.currentTarget.id;
     deletegroupbutton.classList.add('hidden');
     group_members_button.classList.add('hidden')
+    add_members_button.classList.add('hidden');
 
     messageForm.setAttribute('id', 'user_message_form');
 
@@ -344,8 +350,8 @@ async function createGroup(event) {
     chatPage.classList.add('hidden');
     event.preventDefault();
     await findAndDisplayAllUsers('NewGroupList',userItemClickGroup);
-
 }
+
 
 deletegroupbutton.addEventListener('click', deleteGroup, true);
 
@@ -383,16 +389,13 @@ function quitGroup(event){
 }
 group_members_button.addEventListener('click',showmembers,true)
 async function showmembers(event){
-
     let groupid=chatnamedisplay.innerHTML;
     group_members_page.classList.remove('hidden');
     chatPage.classList.add('hidden');
     await findAndDisplayGroupMembers(groupid,group_member_list,userItemClick);
-    event.preventDefault();
+    event.preventDefault();};
 
-        };
-
-        async function findAndDisplayGroupMembers(groupid,member_list,functionName) {
+    async function findAndDisplayGroupMembers(groupid,member_list,functionName) {
             const AllUsersResponse = await fetch(`/groups/${groupid}/users`);
             let AllUsers = await AllUsersResponse.json();
             member_list.innerHTML = '';
@@ -406,7 +409,44 @@ async function showmembers(event){
                 }
             });
         }
-        
+        add_members_button.addEventListener('click',addMembers,true)
+        async function addMembers(event){
+            // let groupid=chatnamedisplay.innerHTML;
+            users_list_page.classList.remove('hidden');
+            chatPage.classList.add('hidden');
+            await findAndDisplayAllUsers('users-list-page',userItemClickGroup);
+            event.preventDefault();
+        }
+
+        add_selected_members.addEventListener('click',addSelectedMembers,true);
+        async function addSelectedMembers(event){
+            event.preventDefault();
+
+    let groupid=chatnamedisplay.innerHTML;
+    const groupPayload = {
+        users: checkedUssers
+    };
+    console.log(groupid);
+    console.log(groupPayload);
+
+    // Send the group payload to the server
+    fetch(`groups/${groupid}/members`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(groupPayload)
+    })
+        .then(() => {
+            // Show the chat page and hide the new group page
+            chatPage.classList.remove('hidden');
+            users_list_page.classList.add('hidden');
+        });
+}
+
+
+
+
 
 function userItemClickGroup(event) {
     const clickedUser = event.currentTarget;
@@ -453,7 +493,7 @@ function onSubmitGroupForm(event) {
     };
 
     // Send the group payload to the server
-    stompClient.send("/app/group.groups", {}, JSON.stringify(groupPayload));
+    stompClient.send("/app/groups", {}, JSON.stringify(groupPayload));
         // Optionally, display a message indicating that the group has been created
 
         // Clear the group name input and checked users list

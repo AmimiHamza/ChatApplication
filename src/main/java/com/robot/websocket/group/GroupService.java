@@ -30,6 +30,7 @@ public class GroupService {
         for (String user : groupDTO.getUsers()) {
             User user1 = UserRepository.findByNickName(user);
             user1.addGroup(group.getId());
+            UserRepository.save(user1);
         }
         return groupRepository.save(group);
     }

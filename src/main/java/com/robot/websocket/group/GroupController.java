@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.robot.websocket.chat.ChatMessage;
 import com.robot.websocket.chat.ChatMessageService;
+import com.robot.websocket.user.User;
 
 @Controller
 @AllArgsConstructor
@@ -49,7 +50,11 @@ public class GroupController {
                 .ok(chatMessageService.findChatMessages(recipientId, recipientId));
     }
 
-
+    @GetMapping("/groups/{groupid}/users")
+    public ResponseEntity<List<User>> findGroupUsers(@PathVariable("groupid") String groupId) {
+        List<User> users = groupService.findUsers(groupId);
+        return ResponseEntity.ok(users);
+    }
     
     
 }

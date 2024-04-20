@@ -1,6 +1,7 @@
 package com.robot.websocket.group;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, String> {
+    Optional<Group> findById(String id);
+
 
     @Query(value = "SELECT * FROM testo.chat_group WHERE EXISTS (SELECT 1 FROM unnest(users) AS u(nickname) WHERE u.nickname = :nickname)", nativeQuery = true)
 

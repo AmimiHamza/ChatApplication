@@ -30,6 +30,11 @@
         <button type="submit">create</button>
     </form>
 </div>
+<!-- group members -->
+<div class="user-form hidden" id="group-members-div">
+        <button id="quit-members">quit</button>
+        <ul id="group-member-list">
+</div>
 
 <div class="chat-container hidden" id="chat-page">
     <div class="users-list">
@@ -47,6 +52,7 @@
     <div class="chat-area">
         <div style="display: flex;"  id="chat-name" class="the-name hidden">
             <div style="display: none;"><div id="chat-name-display"></div></div>
+            <button id="group-members" class="hidden">show members</button>
             <button id="deletegroupbutton" class="hidden">delete group</button>
         </div>
         <div class="chat-area" id="chat-messages">

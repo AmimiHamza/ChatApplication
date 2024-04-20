@@ -3,6 +3,7 @@
 const usernamePage = document.querySelector('#username-page');
 const chatPage = document.querySelector('#chat-page');
 const newGroupPage = document.querySelector('#NewGroup-page');
+const group_members_page= document.querySelector('#group-members-div');
 newGroupPage.classList.add('hidden');
 
 const usernameForm = document.querySelector('#usernameForm');
@@ -17,7 +18,11 @@ const newGroupForm = document.querySelector('#NewGroupForm');
 const chatname= document.querySelector('#chat-name');
 const chatnamedisplay= document.querySelector('#chat-name-display');
 
-const deletegroupbutton = document.querySelector('#deletegroupbutton');//to add
+const deletegroupbutton = document.querySelector('#deletegroupbutton');
+const group_members_button = document.querySelector('#group-members');
+const group_member_list= document.querySelector('#group-member-list');
+const member_list = document.querySelector('#member-list');
+const quit_members_button = document.querySelector('#quit-members');
 let checkedUssers = [];
 
 let stompClient = null;
@@ -141,6 +146,7 @@ async function onMessageReceived(payload) {
         chatnamedisplay.textContent=event.currentTarget.id;
         console.log(event.currentTarget)
         deletegroupbutton.classList.remove('hidden');
+        group_members_button.classList.remove('hidden');
 
         messageForm.setAttribute('id', 'group_message_form');
 
@@ -159,7 +165,6 @@ async function onMessageReceived(payload) {
 
     async function fetchAndDisplayGroupChat() {
         const userChatResponse = await fetch(`/groups/${selectedUserId}/messages`);
-        console.log("selectedUserrrId",selectedUserId);
         const userChat = await userChatResponse.json();
         chatArea.innerHTML = '';
         userChat.forEach(chat => {
@@ -231,6 +236,8 @@ function appendUserElement(user, AllUsersList, functionName) {
 }
 
 function userItemClick(event) {
+    group_members_page.classList.add('hidden');
+    chatPage.classList.remove('hidden');
     document.querySelectorAll('.user-item').forEach(item => {
         item.classList.remove('active');
     });
@@ -239,6 +246,7 @@ function userItemClick(event) {
     chatname.classList.remove('hidden');
     chatnamedisplay.textContent=event.currentTarget.id;
     deletegroupbutton.classList.add('hidden');
+    group_members_button.classList.add('hidden')
 
     messageForm.setAttribute('id', 'user_message_form');
 
@@ -251,7 +259,6 @@ function userItemClick(event) {
     const nbrMsg = clickedUser.querySelector('.nbr-msg');
     nbrMsg.classList.add('hidden');
     nbrMsg.textContent = '0';
-
 }
 
 function displayMessage(senderId, content) {
@@ -368,6 +375,39 @@ async function deleteGroup(event) {
 
 }
 
+quit_members_button.addEventListener('click',quitGroup,true);
+function quitGroup(event){
+    group_members_page.classList.add('hidden');
+    chatPage.classList.remove('hidden');
+    event.preventDefault();
+
+}
+group_members_button.addEventListener('click',showmembers,true)
+async function showmembers(event){
+
+    let groupid=chatnamedisplay.innerHTML;
+    group_members_page.classList.remove('hidden');
+    chatPage.classList.add('hidden');
+    await findAndDisplayGroupMembers(groupid,group_member_list,userItemClick);
+    event.preventDefault();
+
+        };
+
+        async function findAndDisplayGroupMembers(groupid,member_list,functionName) {
+            const AllUsersResponse = await fetch(`/groups/${groupid}/users`);
+            let AllUsers = await AllUsersResponse.json();
+            member_list.innerHTML = '';
+        
+            AllUsers.forEach(user => {
+                appendUserElement(user, member_list, functionName);
+                if (AllUsers.indexOf(user) < AllUsers.length - 1) {
+                    const separator = document.createElement('li');
+                    separator.classList.add('separator');
+                    member_list.appendChild(separator);
+                }
+            });
+        }
+        
 
 function userItemClickGroup(event) {
     const clickedUser = event.currentTarget;

@@ -43,4 +43,17 @@ public class GroupService {
         }
         throw new UnsupportedOperationException("Unimplemented method 'deleteGroup'");
     }
+    public Group findById(String groupId) {
+        Group group=groupRepository.findById(groupId).get();
+        return group;
+    }
+    public List<User> findUsers(String groupId) {
+        Group group = groupRepository.findById(groupId).get();
+        List<User> users = new ArrayList<User>();
+        for (String user : group.getUsers()) {
+            users.add(UserRepository.findByNickName(user));
+        }
+        return users;
+
+    }
 }

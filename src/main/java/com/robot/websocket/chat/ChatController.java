@@ -47,10 +47,5 @@ public class ChatController {
                 .ok(chatMessageService.findChatMessages(senderId, recipientId));
     }
     
-    @GetMapping("/messages/{recipientId}")
-    public ResponseEntity<List<ChatMessage>> findGroupChatMessages(@PathVariable String recipientId) {
-        
-        return ResponseEntity
-                .ok(chatMessageService.findChatMessages(recipientId, recipientId));
-    }
+    
 }

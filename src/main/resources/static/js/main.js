@@ -143,7 +143,6 @@ async function onMessageReceived(payload) {
         deletegroupbutton.classList.remove('hidden');
 
         messageForm.setAttribute('id', 'group_message_form');
-        console.log("hi",deletegroupbutton.id);
 
 
         const clickedUser = event.currentTarget;
@@ -159,7 +158,8 @@ async function onMessageReceived(payload) {
     }
 
     async function fetchAndDisplayGroupChat() {
-        const userChatResponse = await fetch(`/messages/${selectedUserId}`);
+        const userChatResponse = await fetch(`/groups/${selectedUserId}/messages`);
+        console.log("selectedUserrrId",selectedUserId);
         const userChat = await userChatResponse.json();
         chatArea.innerHTML = '';
         userChat.forEach(chat => {
@@ -345,7 +345,6 @@ deletegroupbutton.addEventListener('click', deleteGroup, true);
 
 async function deleteGroup(event) {
     let groupid=chatnamedisplay.innerHTML;
-    console.log("nickname",nickname);
 
     const groupPayload = {name: nickname};
     fetch(`/groups/${groupid}`, {

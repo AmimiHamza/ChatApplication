@@ -16,11 +16,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.robot.websocket.chat.ChatMessage;
+import com.robot.websocket.chat.ChatMessageService;
+
 @Controller
 @AllArgsConstructor
 public class GroupController {
 
     private final GroupService groupService;
+    private final ChatMessageService chatMessageService;
 
     @MessageMapping("/group.groups")
     @SendTo("/user/public")
@@ -36,6 +40,13 @@ public class GroupController {
             groupService.deleteGroup(groupId,user.get("name"));
             return ResponseEntity.ok("Group deleted successfully");
     
+    }
+
+    @GetMapping("/groups/{recipientId}/messages")
+    public ResponseEntity<List<ChatMessage>> findGroupChatMessages(@PathVariable String recipientId) {
+        
+        return ResponseEntity
+                .ok(chatMessageService.findChatMessages(recipientId, recipientId));
     }
 
 

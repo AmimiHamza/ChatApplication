@@ -144,7 +144,6 @@ async function onMessageReceived(payload) {
         messageForm.classList.remove('hidden');
         chatname.classList.remove('hidden');
         chatnamedisplay.textContent=event.currentTarget.id;
-        console.log(event.currentTarget)
         deletegroupbutton.classList.remove('hidden');
         group_members_button.classList.remove('hidden');
 

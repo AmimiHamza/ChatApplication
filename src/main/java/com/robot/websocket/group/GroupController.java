@@ -30,14 +30,11 @@ public class GroupController {
     @MessageMapping("/group.groups")
     @SendTo("/user/public")
     public GroupDTO addGroup(@Payload GroupDTO groupDTO) {
-        System.out.println("papapa: " + groupDTO);
-        
         groupService.saveGroup(groupDTO);
         return groupDTO;
     }
     @DeleteMapping("/groups/{groupid}")
     public ResponseEntity<String> deleteGroup(@PathVariable("groupid") String groupId, @RequestBody Map<String, String> user) {
-            System.out.println("hihi"+groupId + " " + user.get("name"));
             groupService.deleteGroup(groupId,user.get("name"));
             return ResponseEntity.ok("Group deleted successfully");
     

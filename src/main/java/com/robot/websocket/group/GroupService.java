@@ -26,7 +26,6 @@ public class GroupService {
         admins.add(groupDTO.getCreator());
         group.setAdmins(admins);
         group.setCreatedDate(new java.sql.Date(System.currentTimeMillis()));
-        System.out.println(group);
         for (String user : groupDTO.getUsers()) {
             User user1 = UserRepository.findByNickName(user);
             user1.addGroup(group.getId());

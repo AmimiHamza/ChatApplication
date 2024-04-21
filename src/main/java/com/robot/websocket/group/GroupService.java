@@ -65,10 +65,12 @@ public class GroupService {
     public void addGroupMembers(String groupId, List<String> users) {
         Group group = groupRepository.findById(groupId).get();
         for (String user : users) {
+            if (!group.getUsers().contains(user)){
             group.getUsers().add(user);
             User user1 = UserRepository.findByNickName(user);
             user1.addGroup(groupId);
             UserRepository.save(user1);
+        }
         }
         groupRepository.save(group);
         
@@ -76,7 +78,7 @@ public class GroupService {
     public ResponseEntity<String>   removeGroupMember(String groupId, String memberId, String username) {
         Group group = groupRepository.findById(groupId).get();
         if (!group.getCreator().equals(username)) {
-            return ResponseEntity.badRequest().body("you don't have permission to remove member from this group");
+            return ResponseEntity.badRequest().body("Creator cannot be removed");
         }else{
         group.getUsers().remove(memberId);
         User user = UserRepository.findByNickName(memberId);
@@ -84,6 +86,6 @@ public class GroupService {
         UserRepository.save(user);
         groupRepository.save(group);
         return ResponseEntity.ok("Member removed successfully");
-    }
+        }
     }
 }

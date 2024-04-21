@@ -35,6 +35,15 @@ public class User {
             groups.add(group);
 
         }
+
+
+    public void removeGroup(String groupId) {
+        List<String> groups = this.getGroups();
+        if (groups == null) {
+            groups = new ArrayList<String>();
+        }
+        groups.remove(groupId);
+    }
     }
 
 

@@ -21,6 +21,11 @@ const chatnamedisplay= document.querySelector('#chat-name-display');
 const deletegroupbutton = document.querySelector('#deletegroupbutton');
 const group_members_button = document.querySelector('#group-members');
 const add_members_button = document.querySelector('#add-members');
+const delete_member_button = document.querySelector('#delete-member');
+const delete_member_page = document.querySelector('#delete-member-page');
+const delete_member_form = document.querySelector('#delete-member-form');
+
+
 const add_selected_members=document.querySelector('#add-selected-members')
 const group_member_list= document.querySelector('#group-member-list');
 const member_list = document.querySelector('#member-list');
@@ -151,6 +156,7 @@ async function onMessageReceived(payload) {
         deletegroupbutton.classList.remove('hidden');
         group_members_button.classList.remove('hidden');
         add_members_button.classList.remove('hidden');
+        delete_member_button.classList.remove('hidden');
 
         messageForm.setAttribute('id', 'group_message_form');
 
@@ -179,6 +185,8 @@ async function onMessageReceived(payload) {
 }
 
 async function findAndDisplayAllUsers(listid,functionName) {
+    chatname.classList.add('hidden');
+
     const AllUsersResponse = await fetch('/users');
     let AllUsers = await AllUsersResponse.json();
     AllUsers = AllUsers.filter(user => user.nickName !== nickname);
@@ -252,6 +260,7 @@ function userItemClick(event) {
     deletegroupbutton.classList.add('hidden');
     group_members_button.classList.add('hidden')
     add_members_button.classList.add('hidden');
+    delete_member_button.classList.add('hidden');
 
     messageForm.setAttribute('id', 'user_message_form');
 
@@ -369,6 +378,8 @@ async function deleteGroup(event) {
 
             .then(() => {
                 console.log("Group deleted");
+                messageForm.classList.add('hidden');
+                chatname.classList.add('hidden');  //to fix
             });
         ;
     event.preventDefault();
@@ -376,7 +387,6 @@ async function deleteGroup(event) {
         groupList.innerHTML = '';
         await findAndDisplayAllUsers('AllUsers',userItemClick);
         await findAndDisplayAllGroups();
-        chatArea.classList.add('hidden');
 
 }
 
@@ -444,7 +454,28 @@ async function showmembers(event){
         });
 }
 
+// delete member
+delete_member_button.addEventListener('click',deleteMember,true);
+async function deleteMember(event){
+    delete_member_page.classList.remove('hidden');
+    chatPage.classList.add('hidden');
+}
+delete_member_form.addEventListener('submit',deleteSelectedMember,true);
+async function deleteSelectedMember(event){
+    
+    const memberid = document.querySelector('#member-id').value.trim();  
+    let groupid=chatnamedisplay.innerHTML;
+    const groupPayload = {name: nickname};
+    fetch(`/groups/${groupid}/members/${memberid}`,
+     {method: 'DELETE',headers: {'Content-Type': 'application/json'},
+     body: JSON.stringify(groupPayload)});
 
+
+    
+    event.preventDefault();
+    chatPage.classList.remove('hidden');
+    delete_member_page.classList.add('hidden');
+}
 
 
 

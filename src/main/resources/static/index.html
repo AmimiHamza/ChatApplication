@@ -30,6 +30,15 @@
         <button type="submit">create</button>
     </form>
 </div>
+<!-- delete member -->
+<div class="user-form hidden" id="delete-member-page">
+    <form  id="delete-member-form">
+        <label for="memberID">Member ID :</label>
+        <input type="text" id="member-id" name="member-id" required>
+        <button type="submit">kick</button>
+    </form>
+</div>
+
 <!-- group members -->
 <div class="user-form hidden" id="group-members-div">
         <button id="quit-members">quit</button>
@@ -60,6 +69,7 @@
             <div style="display: none;"><div id="chat-name-display"></div></div>
             <button id="group-members" class="hidden">show members</button>
             <button id="add-members" class="hidden">add member</button>
+            <button id="delete-member" class="hidden">delete member</button>
             <button id="deletegroupbutton" class="hidden">delete group</button>
         </div>
         <div class="chat-area" id="chat-messages">

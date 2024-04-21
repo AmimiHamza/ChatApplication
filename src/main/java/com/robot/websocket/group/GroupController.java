@@ -60,4 +60,9 @@ public class GroupController {
         groupService.addGroupMembers(groupId, users.get("users"));
         return ResponseEntity.ok("Group members added successfully");
     }
+
+    @DeleteMapping("/groups/{groupid}/members/{memberid}")
+    public ResponseEntity<String> removeGroupMember(@PathVariable("groupid") String groupId, @PathVariable("memberid") String memberId, @RequestBody Map<String, String> user) {
+        return groupService.removeGroupMember(groupId, memberId, user.get("name"));
+    }
 }

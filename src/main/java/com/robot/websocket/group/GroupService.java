@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.robot.websocket.user.User;
@@ -71,5 +72,18 @@ public class GroupService {
         }
         groupRepository.save(group);
         
+    }
+    public ResponseEntity<String>   removeGroupMember(String groupId, String memberId, String username) {
+        Group group = groupRepository.findById(groupId).get();
+        if (!group.getCreator().equals(username)) {
+            return ResponseEntity.badRequest().body("you don't have permission to remove member from this group");
+        }else{
+        group.getUsers().remove(memberId);
+        User user = UserRepository.findByNickName(memberId);
+        user.removeGroup(groupId);
+        UserRepository.save(user);
+        groupRepository.save(group);
+        return ResponseEntity.ok("Member removed successfully");
+    }
     }
 }

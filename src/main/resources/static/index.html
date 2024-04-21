@@ -26,7 +26,7 @@
     <form  id="NewGroupForm">
         <label for="NewGroupName">Group Name:</label>
         <input type="text" id="groupName" name="NewGroupName" required>
-        <ul id="NewGroupList">
+        <ul id="NewGroupList"></ul>
         <button type="submit">create</button>
     </form>
 </div>
@@ -42,21 +42,19 @@
 <!-- group members -->
 <div class="user-form hidden" id="group-members-div">
         <button id="quit-members">quit</button>
-        <ul id="group-member-list">
+        <ul id="group-member-list"></ul>
 </div>
 
 <div class="user-form hidden" id="users-list-page">
-    <input type="text" value="" class="hidden" id="groupName-addmembers">
     <button id="add-selected-members">add</button>
-    <ul id="user-list-to-add">
+    <ul id="user-list-to-add"></ul>
 </div>
 
 <div class="chat-container hidden" id="chat-page">
     <div class="users-list">
         <div class="users-list-container">
             <h2>Users</h2><button  id="NewGroupButton">New Group</button>
-            <ul id="AllUsers">
-            </ul>
+            <ul id="AllUsers"></ul>
         </div>
         <div>
             <p id="connected-user-fullname"></p>

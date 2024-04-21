@@ -424,35 +424,37 @@ async function showmembers(event){
             // let groupid=chatnamedisplay.innerHTML;
             users_list_page.classList.remove('hidden');
             chatPage.classList.add('hidden');
-            await findAndDisplayAllUsers('users-list-page',userItemClickGroup);
+            await findAndDisplayAllUsers('user-list-to-add',userItemClickGroup);
             event.preventDefault();
         }
 
         add_selected_members.addEventListener('click',addSelectedMembers,true);
+        
         async function addSelectedMembers(event){
-            event.preventDefault();
+                event.preventDefault();
 
-    let groupid=chatnamedisplay.innerHTML;
-    const groupPayload = {
-        users: checkedUssers
-    };
-    console.log(groupid);
-    console.log(groupPayload);
+        let groupid=chatnamedisplay.innerHTML;
+        const groupPayload = {
+            users: checkedUssers
+        };
 
-    // Send the group payload to the server
-    fetch(`groups/${groupid}/members`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(groupPayload)
-    })
-        .then(() => {
-            // Show the chat page and hide the new group page
-            chatPage.classList.remove('hidden');
-            users_list_page.classList.add('hidden');
-        });
-}
+
+        // Send the group payload to the server
+        fetch(`groups/${groupid}/members`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(groupPayload)
+        })
+            .then(() => {
+                // Show the chat page and hide the new group page
+                chatPage.classList.remove('hidden');
+                users_list_page.classList.add('hidden');
+            });
+            const groupList = document.getElementById('user-list-to-add');
+            groupList.innerHTML = '';
+    }
 
 // delete member
 delete_member_button.addEventListener('click',deleteMember,true);
@@ -530,6 +532,8 @@ function onSubmitGroupForm(event) {
         // Clear the group name input and checked users list
         document.querySelector('#groupName').value = '';
         checkedUssers = [];
+        document.querySelector('#NewGroupList').innerHTML = '';
+        
         
         // Show the chat page and hide the new group page
         chatPage.classList.remove('hidden');

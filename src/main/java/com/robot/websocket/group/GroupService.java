@@ -34,12 +34,13 @@ public class GroupService {
         admins.add(groupDTO.getCreator());
         group.setAdmins(admins);
         group.setCreatedDate(new java.sql.Date(System.currentTimeMillis()));
+        groupRepository.save(group);
         for (String user : groupDTO.getUsers()) {
             User user1 = UserRepository.findByEmail(user);
             user1.addGroup(group.getId());
             UserRepository.save(user1);
         }
-        return groupRepository.save(group);
+        return group;
     }
     public List<Group> findallgroupsofemail(String email) {
         return groupRepository.findAllByUser(email);

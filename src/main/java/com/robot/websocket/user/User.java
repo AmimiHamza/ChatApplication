@@ -3,11 +3,13 @@ package com.robot.websocket.user;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,17 +21,21 @@ import java.util.List;
 
 public class User {
     @Id
-    private String nickName;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String email;
     private String fullName;
+    private String password;
     private Status status;
-    private List<String> groups = new ArrayList<>();
+    private Date lastLogin;
+    private List<Long> groups = new ArrayList<>();
 
 
-    public void addGroup(String group){
-            List<String> groups = this.getGroups();
+    public void addGroup(Long group){
+            List<Long> groups = this.getGroups();
             if (groups == null) 
             {
-                groups = new ArrayList<String>();
+                groups = new ArrayList<Long>();
                 
             }
             groups.add(group);
@@ -37,10 +43,10 @@ public class User {
         }
 
 
-    public void removeGroup(String groupId) {
-        List<String> groups = this.getGroups();
+    public void removeGroup(Long groupId) {
+        List<Long> groups = this.getGroups();
         if (groups == null) {
-            groups = new ArrayList<String>();
+            groups = new ArrayList<Long>();
         }
         groups.remove(groupId);
     }

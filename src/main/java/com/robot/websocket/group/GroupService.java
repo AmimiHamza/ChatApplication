@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.robot.websocket.user.User;
 import com.robot.websocket.user.UserRepository;
+import com.robot.websocket.chat.ChatMessageService;
+import com.robot.websocket.chatroom.ChatRoom;
 import com.robot.websocket.chatroom.ChatRoomService;
 
 
@@ -18,6 +20,7 @@ import com.robot.websocket.chatroom.ChatRoomService;
 public class GroupService {
     private final UserRepository UserRepository;
     private final GroupRepository groupRepository;
+    private final ChatMessageService chatMessageService;
     private final ChatRoomService chatRoomService;
 
     public Group saveGroup(GroupDTO groupDTO) {
@@ -51,7 +54,8 @@ public class GroupService {
                 UserRepository.save(user1);
             }
             var chatId = chatRoomService.getChatRoomId(String.valueOf(groupId),String.valueOf(groupId), true);
-            chatRoomService.deleteChatRoom(chatId);
+            System.out.println("papa"+chatId);
+            chatMessageService.deleteChatMessages(chatId);
         }
         throw new UnsupportedOperationException("Unimplemented method 'deleteGroup'");
     }

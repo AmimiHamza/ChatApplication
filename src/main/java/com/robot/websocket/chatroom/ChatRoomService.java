@@ -20,13 +20,6 @@ public class ChatRoomService {
 }
 
 
-    public void deleteChatRoom(String chatId) {
-        List<ChatRoom> chatRooms = chatRoomRepository.findAll();
-        for (ChatRoom chatRoom : chatRooms) {
-            if (chatRoom.getChatId().equals(chatId)) {
-                chatRoomRepository.delete(chatRoom);
-            }
-        }
-    }
+    
     
 }

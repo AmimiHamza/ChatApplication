@@ -29,9 +29,11 @@ public class GroupController {
     private final GroupService groupService;
     private final ChatMessageService chatMessageService;
 
-    @MessageMapping("/groups")
-    @SendTo("/user/public")
-    public GroupDTO addGroup(@Payload GroupDTO groupDTO) {
+    // @MessageMapping("/groups")
+    // @SendTo("/user/public")     //for realtime
+    @PostMapping("/groups/")       //for rest anotations
+    public GroupDTO addGroup(@RequestBody GroupDTO groupDTO) {
+        System.out.println("hayo"+groupDTO);
         groupService.saveGroup(groupDTO);
         return groupDTO;
     }

@@ -554,10 +554,13 @@ function onSubmitGroupForm(event) {
         creator:`${email}`,
         users: checkedUssers
     };
-
     // Send the group payload to the server
-    stompClient.send("/app/groups", {}, JSON.stringify(groupPayload));
-        // Optionally, display a message indicating that the group has been created
+
+    //for Rest anotations
+    fetch(`groups/`, {method: 'POST',headers: {'Content-Type': 'application/json'},body: JSON.stringify(groupPayload) })
+    
+    //for realtime
+    // stompClient.send("/app/groups", {}, JSON.stringify(groupPayload));
 
         // Clear the group name input and checked users list
         document.querySelector('#groupName').value = '';

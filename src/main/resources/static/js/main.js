@@ -35,34 +35,42 @@ const users_list_page = document.querySelector('#users-list-page');
 let checkedUssers = [];
 
 let stompClient = null;
-let nickname = null;
+let email = null;
 let fullname = null;
 let selectedUserId = null;
 let notifiedUser = null;
+let password=null;
 
 function connect(event) {
-    nickname = document.querySelector('#nickname').value.trim();
-    fullname = document.querySelector('#fullname').value.trim();
+    email = document.querySelector('#email').value.trim();
+    password = document.querySelector('#password').value.trim();
 
-    if (nickname && fullname) {
+    if (email && password) {
         const socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
-
+        //test if exists
         stompClient.connect({}, onConnected, onError);
     }
     event.preventDefault();
 }
 
 
-function onConnected() {
-    stompClient.subscribe(`/user/${nickname}/queue/messages`, onMessageReceived);
+async function onConnected() {
+    stompClient.subscribe(`/user/${email}/queue/messages`, onMessageReceived);
     stompClient.subscribe(`/user/public`, onMessageReceived);
     stompClient.subscribe('/user/publiceo', onMessageReceived);
 
     stompClient.send("/app/user.addUser",
         {},
-        JSON.stringify({nickName: nickname, fullName: fullname, status: 'ONLINE'})
+        JSON.stringify({email: email, password: password, status: 'ONLINE'})
     );
+
+    const response = await fetch(`/user/${email}`);
+    var fullname = await response.json();
+    fullname = fullname.fullName;
+
+
+
     document.querySelector('#connected-user-fullname').textContent = fullname;
     usernamePage.classList.add('hidden');
     chatPage.classList.remove('hidden');
@@ -80,25 +88,39 @@ async function onMessageReceived(payload) {
 
 
     if (selectedUserId) {
-        document.querySelector(`#${selectedUserId}`).classList.add('active');
+        document.querySelector(`#_${selectedUserId}`).classList.add('active');
     } else {
         messageForm.classList.add('hidden');
         chatname.classList.add('hidden');
    }
 
+   console.log("selectedUserId: "+selectedUserId);
+    console.log("message.senderId: "+message.senderId);
+    console.log("message.recipientId: "+message.recipientId);
+    console.log("email: "+email);
+    console.log("message.chatId: "+message.chatId);
+    console.log("message.content: "+message.content);
 
-    if (selectedUserId && selectedUserId === message.senderId && nickname===message.recipientId) {
-        displayMessage(message.senderId, message.content);
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }else if(selectedUserId && selectedUserId === message.recipientId){
-        displayMessage(message.senderId, message.content);
-        chatArea.scrollTop = chatArea.scrollHeight;
+    if (message.chatId){//group message
+        if (selectedUserId && parseInt(selectedUserId) === parseInt(message.recipientId)) {
+            displayMessage(message.senderId, message.content);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+    }else{//normal chat message
+        if (selectedUserId && selectedUserId === message.senderId) {
+            displayMessage(message.senderId, message.content);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
     }
 
-    if (message.recipientId === nickname) {
-    var notifiedUser = document.querySelector(`#${message.senderId}`);}
+
+    
+
+    if (message.recipientId === email) {
+    var notifiedUser = document.querySelector(`#_${message.senderId}`);}
     else{
-        var notifiedUser = document.querySelector(`#${message.recipientId}`);
+        var notifiedUser = document.querySelector(`#_${message.recipientId}`);
     }
     if (notifiedUser && !notifiedUser.classList.contains('active')) {
         const nbrMsg = notifiedUser.querySelector('.nbr-msg');
@@ -111,21 +133,21 @@ async function onMessageReceived(payload) {
 
     
     async function findAndDisplayAllGroups() {
-        const response = await fetch(`/user/${nickname}/groups`);
+        const response = await fetch(`/user/${email}/groups`);
         const groups = await response.json();
         const groupList = document.getElementById('AllUsers');
 
         groups.forEach(group => {
             const listItem = document.createElement('li');
             listItem.classList.add('user-item');
-            listItem.id = group.id;
+            listItem.id = "_"+group.id;
 
             const groupnameSpan = document.createElement('span');
             groupnameSpan.textContent = group.name;
 
             const groupImage = document.createElement('img');
             groupImage.src = '../img/group_icon.jpg';
-            groupImage.alt = group.fullName;
+            groupImage.alt = group.name;
 
             const receivedMsgs = document.createElement('span');
             receivedMsgs.textContent = '0';
@@ -152,7 +174,7 @@ async function onMessageReceived(payload) {
         });
         messageForm.classList.remove('hidden');
         chatname.classList.remove('hidden');
-        chatnamedisplay.textContent=event.currentTarget.id;
+        chatnamedisplay.textContent=parseInt(event.currentTarget.id.substring(1));
         deletegroupbutton.classList.remove('hidden');
         group_members_button.classList.remove('hidden');
         add_members_button.classList.remove('hidden');
@@ -164,7 +186,7 @@ async function onMessageReceived(payload) {
         const clickedUser = event.currentTarget;
         clickedUser.classList.add('active');
 
-        selectedUserId = clickedUser.getAttribute('id');
+        selectedUserId = parseInt(clickedUser.getAttribute('id').substring(1));
         fetchAndDisplayGroupChat().then();
         const nbrMsg = clickedUser.querySelector('.nbr-msg');
         nbrMsg.classList.add('hidden');
@@ -189,7 +211,7 @@ async function findAndDisplayAllUsers(listid,functionName) {
 
     const AllUsersResponse = await fetch('/users');
     let AllUsers = await AllUsersResponse.json();
-    AllUsers = AllUsers.filter(user => user.nickName !== nickname);
+    AllUsers = AllUsers.filter(user => user.email !== email);
     const AllUsersList = document.getElementById(listid);
     if(listid == 'AllUsers'){
         AllUsersList.innerHTML = '';
@@ -209,15 +231,21 @@ function appendUserElement(user, AllUsersList, functionName) {
 
     const listItem = document.createElement('li');
     listItem.classList.add('user-item');
-    listItem.id = user.nickName;
+    listItem.id = "_"+user.email;
 
     const onlinedot = document.createElement('H1');
     onlinedot.textContent = '•';
     onlinedot.style.fontSize = '1.5em';
+    const LastSeenSpan = document.createElement('span');
+
+    
     if (user.status === 'ONLINE') {
         onlinedot.style.color = 'lime';
     } else {
-        onlinedot.style.color = 'red';}
+        onlinedot.style.color = 'red';
+        LastSeenSpan.textContent = "last seen "+user.lastLogin;
+    
+    }
 
     const userImage = document.createElement('img');
     userImage.src = '../img/user_icon.png';
@@ -225,6 +253,8 @@ function appendUserElement(user, AllUsersList, functionName) {
 
     const usernameSpan = document.createElement('span');
     usernameSpan.textContent = user.fullName;
+
+    
 
     const checked = document.createElement('H1');
     checked.textContent = '•';
@@ -241,9 +271,9 @@ function appendUserElement(user, AllUsersList, functionName) {
     listItem.appendChild(usernameSpan);
     listItem.appendChild(receivedMsgs);
     listItem.appendChild(onlinedot);
+    listItem.appendChild(LastSeenSpan)
 
     listItem.addEventListener('click', functionName);
-
     AllUsersList.appendChild(listItem);
 }
 
@@ -267,7 +297,7 @@ function userItemClick(event) {
     const clickedUser = event.currentTarget;
     clickedUser.classList.add('active');
 
-    selectedUserId = clickedUser.getAttribute('id');
+    selectedUserId = clickedUser.getAttribute('id').substring(1);
     fetchAndDisplayUserChat().then();
 
     const nbrMsg = clickedUser.querySelector('.nbr-msg');
@@ -278,7 +308,7 @@ function userItemClick(event) {
 function displayMessage(senderId, content) {
     const messageContainer = document.createElement('div');
     messageContainer.classList.add('message');
-    if (senderId === nickname) {
+    if (senderId === email) {
         messageContainer.classList.add('sender');
     } else {
         messageContainer.classList.add('receiver');
@@ -297,7 +327,7 @@ function displayMessage(senderId, content) {
 }
 
 async function fetchAndDisplayUserChat() {
-    const userChatResponse = await fetch(`/messages/${nickname}/${selectedUserId}`);
+    const userChatResponse = await fetch(`/messages/${email}/${selectedUserId}`);
     const userChat = await userChatResponse.json();
     chatArea.innerHTML = '';
     userChat.forEach(chat => {
@@ -318,7 +348,7 @@ function sendMessage(event) {
     if (messageContent && stompClient) {
     if(messageForm.id === 'group_message_form'){
         const chatMessage = {
-            senderId: nickname,
+            senderId: email,
             recipientId: selectedUserId,
             content: messageInput.value.trim(),
             timestamp: new Date()
@@ -328,13 +358,13 @@ function sendMessage(event) {
     }
     else{
         const chatMessage = {
-            senderId: nickname,
+            senderId: email,
             recipientId: selectedUserId,
             content: messageInput.value.trim(),
             timestamp: new Date()
         };
         stompClient.send("/app/chat.sendmessage", {}, JSON.stringify(chatMessage));
-        displayMessage(nickname, messageInput.value.trim());
+        displayMessage(email, messageInput.value.trim());
         messageInput.value = '';
     }
 }
@@ -346,9 +376,9 @@ function sendMessage(event) {
 
 
 function onLogout() {
-    stompClient.send("/app/user.disconnectUser",
+    stompClient.send(`/app/user.disconnectUser`,
         {},
-        JSON.stringify({nickName: nickname, fullName: fullname, status: 'OFFLINE'})
+        JSON.stringify({email: email, fullName: fullname, status: 'OFFLINE'})
     );
     window.location.reload();
 }
@@ -367,7 +397,7 @@ deletegroupbutton.addEventListener('click', deleteGroup, true);
 async function deleteGroup(event) {
     let groupid=chatnamedisplay.innerHTML;
 
-    const groupPayload = {name: nickname};
+    const groupPayload = {name: email};
     fetch(`/groups/${groupid}`, {
         method: 'DELETE',
         headers: {
@@ -467,7 +497,7 @@ async function deleteSelectedMember(event){
     
     const memberid = document.querySelector('#member-id').value.trim();  
     let groupid=chatnamedisplay.innerHTML;
-    const groupPayload = {name: nickname};
+    const groupPayload = {name: email};
     fetch(`/groups/${groupid}/members/${memberid}`,
      {method: 'DELETE',headers: {'Content-Type': 'application/json'},
      body: JSON.stringify(groupPayload)});
@@ -483,7 +513,7 @@ async function deleteSelectedMember(event){
 
 function userItemClickGroup(event) {
     const clickedUser = event.currentTarget;
-    selectedUserId = clickedUser.getAttribute('id');
+    selectedUserId = clickedUser.getAttribute('id').substring(1);
 
     // Check if the user is already checked
     const isChecked = checkedUssers.includes(selectedUserId);
@@ -516,12 +546,12 @@ function onSubmitGroupForm(event) {
     // Get the group name from the form
     const groupName = document.querySelector('#groupName').value.trim();
     //add the current user to the group
-    checkedUssers.push(nickname);
+    checkedUssers.push(email);
     // Create a payload object with the group name and selected user IDs
     
     const groupPayload = {
         name: groupName,
-        creator:`${nickname}`,
+        creator:`${email}`,
         users: checkedUssers
     };
 

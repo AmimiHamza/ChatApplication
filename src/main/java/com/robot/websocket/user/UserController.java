@@ -20,13 +20,24 @@ public class UserController {
 
     private final UserService userService;
     private final GroupService groupService;
+    private final UserRepository userRepository;
 
     @MessageMapping("/user.addUser")
     @SendTo("/user/public")
     public User addUser(
             @Payload User user
     ) {
-        userService.saveUser(user);
+        User user1=userRepository.findByEmail(user.getEmail());
+        if(user1==null)
+        {
+            user.setStatus(Status.ONLINE);
+            userService.saveUser(user);
+        }
+        else
+        {
+            user1.setStatus(Status.ONLINE);
+            userService.saveUser(user1);
+        }
         return user;
     }
 
@@ -44,9 +55,15 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 
-    @GetMapping("/user/{nickname}/groups")
-    public ResponseEntity<List<Group>> getGroupsByNickname(@PathVariable String nickname) { 
-        List<Group> groups = groupService.findallgroupsofnickname(nickname);
+    @GetMapping("/user/{email}/groups")
+    public ResponseEntity<List<Group>> getGroupsByEmail(@PathVariable String email) { 
+        List<Group> groups = groupService.findallgroupsofemail(email);
         return ResponseEntity.ok(groups);
+    }
+
+    @GetMapping("/user/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) { 
+        User user=userRepository.findByEmail(email);
+        return ResponseEntity.ok(user);
     }
 }

@@ -74,8 +74,8 @@ async function onConnected() {
     document.querySelector('#connected-user-fullname').textContent = fullname;
     usernamePage.classList.add('hidden');
     chatPage.classList.remove('hidden');
-    findAndDisplayAllUsers().then();
-    findAndDisplayAllGroups().then();
+    // findAndDisplayAllUsers().then();
+    // findAndDisplayAllGroups().then();
     
 }
 

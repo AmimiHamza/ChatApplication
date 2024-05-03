@@ -18,7 +18,7 @@ import jakarta.persistence.Table;
 @Table(name = "chat_conversation",schema = "testo")
 public class Conversation {
     @Id
-    private Long chatId;
-    private Long member1Id;
-    private Long member2Id;
+    private String chatId;
+    private String member1Id;
+    private String member2Id;
 }

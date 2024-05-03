@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+import com.robot.websocket.conversation.Conversation;
+import com.robot.websocket.conversation.ConversationRepository;
 
 import java.util.List;
 
@@ -12,13 +14,17 @@ import java.util.List;
 public class ChatMessageService {
     private final ChatMessageRepository repository;
     private final ChatMessageRepository chatMessageRepository;
+    private final ConversationRepository conversationRepository;
 
     public ChatMessage saveusermessage(ChatMessage chatMessage) {
         var chatId = getChatRoomId(chatMessage.getSenderId(), chatMessage.getRecipientId(), true);
-
-
         chatMessage.setChatId(chatId);
         repository.save(chatMessage);
+        Conversation conversation = new Conversation();
+        conversation.setChatId(chatId);
+        conversation.setMember1Id(chatMessage.getSenderId());
+        conversation.setMember2Id(chatMessage.getRecipientId());
+        conversationRepository.save(conversation);
         return chatMessage;
     }
     public ChatMessage savegroupmessage(ChatMessage chatMessage) {
@@ -52,5 +58,12 @@ public class ChatMessageService {
     var chatId = String.format("%s_%s",first, second);
             return chatId;
 }
+    public ChatMessage findLastMessage(String chatId) {
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatId(chatId);
+        if (chatMessages.size() > 0) {
+            return chatMessages.get(chatMessages.size() - 1);
+        }
+        return null;
+    }
     
 }

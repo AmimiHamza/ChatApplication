@@ -9,6 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.robot.websocket.conversation.Conversation;
+import com.robot.websocket.conversation.ConversationDTO;
+import com.robot.websocket.conversation.ConversationService;
 import com.robot.websocket.group.Group;
 import com.robot.websocket.group.GroupService;
 
@@ -21,6 +24,7 @@ public class UserController {
     private final UserService userService;
     private final GroupService groupService;
     private final UserRepository userRepository;
+    private final ConversationService conversationService;
 
     @MessageMapping("/user.addUser")
     @SendTo("/user/public")
@@ -66,4 +70,15 @@ public class UserController {
         User user=userRepository.findByEmail(email);
         return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/user/{email}/conversations")
+    public ResponseEntity<List<ConversationDTO>> getUserConversations(@PathVariable String email) {
+        List<ConversationDTO> conversations = conversationService.findConversationsByEmail(email);
+        return ResponseEntity.ok(conversations);
+    }
+
+
+
+
+
 }

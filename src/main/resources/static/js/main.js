@@ -25,6 +25,9 @@ const delete_member_button = document.querySelector('#delete-member');
 const delete_member_page = document.querySelector('#delete-member-page');
 const delete_member_form = document.querySelector('#delete-member-form');
 
+const NewChatButton = document.querySelector('#NewChatButton');
+
+
 
 const add_selected_members=document.querySelector('#add-selected-members')
 const group_member_list= document.querySelector('#group-member-list');
@@ -81,7 +84,7 @@ async function onConnected() {
 
 async function onMessageReceived(payload) {
 
-    await findAndDisplayAllUsers('AllUsers',userItemClick);
+    await findAndDisplayAllConversations('AllUsers',conversationItemClick);
     await findAndDisplayAllGroups();
     const message = JSON.parse(payload.body);
 
@@ -93,13 +96,6 @@ async function onMessageReceived(payload) {
         messageForm.classList.add('hidden');
         chatname.classList.add('hidden');
    }
-
-   console.log("selectedUserId: "+selectedUserId);
-    console.log("message.senderId: "+message.senderId);
-    console.log("message.recipientId: "+message.recipientId);
-    console.log("email: "+email);
-    console.log("message.chatId: "+message.chatId);
-    console.log("message.content: "+message.content);
 
     if (message.chatId){//group message
         if (selectedUserId && parseInt(selectedUserId) === parseInt(message.recipientId)) {
@@ -574,6 +570,126 @@ function onSubmitGroupForm(event) {
     } 
 
 
+//new chat 
+NewChatButton.addEventListener('click', newChat, true);
+async function newChat(event) {
+    chatPage.classList.remove('hidden');
+    let AllUsersList = document.getElementById('AllUsers');
+    AllUsersList.innerHTML = '';
+    await findAndDisplayAllUsers('AllUsers',userItemClick);
+    event.preventDefault();
+}
+
+async function findAndDisplayAllConversations(listid,functionName) {
+    chatname.classList.add('hidden');
+
+
+    const AllConversationsResponse = await fetch(`/user/${email}/conversations`);
+    let AllConversations = await AllConversationsResponse.json();
+    const AllConversationsList = document.getElementById(listid);
+    if(listid == 'AllUsers'){
+        AllConversationsList.innerHTML = '';
+    }
+
+    AllConversations.forEach(Conversation => {
+        appendConversationElement(Conversation, AllConversationsList, functionName);
+        if (AllConversations.indexOf(Conversation) < AllConversations.length - 1) {
+            const separator = document.createElement('li');
+            separator.classList.add('separator');
+            AllConversationsList.appendChild(separator);
+        }
+    });
+}
+function appendConversationElement(Conversation, AllConversationsList, functionName) {
+
+    const listItem = document.createElement('li');
+    listItem.classList.add('user-item');
+    listItem.id = "_"+Conversation.email;
+
+    const onlinedot = document.createElement('H1');
+    onlinedot.textContent = '•';
+    onlinedot.style.fontSize = '1.5em';
+    const LastSeenSpan = document.createElement('span');
+
+    
+    if (Conversation.status === 'ONLINE') {
+        onlinedot.style.color = 'lime';
+    } else {
+        onlinedot.style.color = 'red';
+        LastSeenSpan.textContent = "last seen "+Conversation.lastLogin;
+    
+    }
+
+    const ConversationImage = document.createElement('img');
+    ConversationImage.src = '../img/User_icon.png';
+    ConversationImage.alt = Conversation.fullName;
+
+    const ConversationnameSpan = document.createElement('span');
+    ConversationnameSpan.textContent = Conversation.fullname;
+
+    
+
+
+
+    const receivedMsgs = document.createElement('span');
+    receivedMsgs.textContent = '0';
+    receivedMsgs.classList.add('nbr-msg', 'hidden');
+
+    listItem.appendChild(ConversationImage);
+    listItem.appendChild(ConversationnameSpan);
+    listItem.appendChild(receivedMsgs);
+    listItem.appendChild(onlinedot);
+    listItem.appendChild(LastSeenSpan)
+
+    listItem.addEventListener('click', functionName);
+    AllConversationsList.appendChild(listItem);
+}
+
+function conversationItemClick(event) {
+    group_members_page.classList.add('hidden');
+    chatPage.classList.remove('hidden');
+    document.querySelectorAll('.user-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    messageForm.classList.remove('hidden');
+
+    chatname.classList.remove('hidden');
+    chatnamedisplay.textContent=event.currentTarget.id;
+
+    deletegroupbutton.classList.add('hidden');
+    group_members_button.classList.add('hidden')
+    add_members_button.classList.add('hidden');
+    delete_member_button.classList.add('hidden');
+
+    messageForm.setAttribute('id', 'user_message_form');
+
+    const clickedUser = event.currentTarget;
+    clickedUser.classList.add('active');
+
+    selectedUserId = clickedUser.getAttribute('id').substring(1);
+
+    const first = email < selectedUserId ? email : selectedUserId;
+    const second = email < selectedUserId ? selectedUserId : email;
+    const chatId = `${first}_${second}`;
+    
+
+    
+    fetchAndDisplayConversationChat(chatId).then();
+
+    const nbrMsg = clickedUser.querySelector('.nbr-msg');
+    nbrMsg.classList.add('hidden');
+    nbrMsg.textContent = '0';
+}
+
+async function fetchAndDisplayConversationChat(ConversationId) {
+    const userChatResponse = await fetch(`/conversation/${ConversationId}/messages`);
+    const userChat = await userChatResponse.json();
+    chatArea.innerHTML = '';
+    userChat.forEach(chat => {
+        displayMessage(chat.senderId, chat.content);
+    });
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
 
 
 

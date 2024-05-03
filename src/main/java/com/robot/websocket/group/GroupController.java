@@ -44,11 +44,11 @@ public class GroupController {
     
     }
 
-    @GetMapping("/groups/{recipientId}/messages")
-    public ResponseEntity<List<ChatMessage>> findGroupChatMessages(@PathVariable String recipientId) {
+    @GetMapping("/groups/{groupId}/messages")
+    public ResponseEntity<List<ChatMessage>> findGroupChatMessages(@PathVariable String groupId) {
         
         return ResponseEntity
-                .ok(chatMessageService.findChatMessages(recipientId, recipientId));
+                .ok(chatMessageService.findChatMessages(groupId, groupId));
     }
 
     @GetMapping("/groups/{groupid}/users")

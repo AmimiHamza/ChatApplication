@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import com.robot.websocket.user.User;
 import com.robot.websocket.user.UserRepository;
 import com.robot.websocket.chat.ChatMessageService;
-import com.robot.websocket.chatroom.ChatRoom;
-import com.robot.websocket.chatroom.ChatRoomService;
 
 
 @Service
@@ -21,7 +19,6 @@ public class GroupService {
     private final UserRepository UserRepository;
     private final GroupRepository groupRepository;
     private final ChatMessageService chatMessageService;
-    private final ChatRoomService chatRoomService;
 
     public Group saveGroup(GroupDTO groupDTO) {
         Group group = new Group();
@@ -54,7 +51,7 @@ public class GroupService {
                 user1.removeGroup(groupId);
                 UserRepository.save(user1);
             }
-            var chatId = chatRoomService.getChatRoomId(String.valueOf(groupId),String.valueOf(groupId), true);
+            var chatId = chatMessageService.getChatRoomId(String.valueOf(groupId),String.valueOf(groupId), true);
             System.out.println("papa"+chatId);
             chatMessageService.deleteChatMessages(chatId);
         }

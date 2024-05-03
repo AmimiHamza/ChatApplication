@@ -30,16 +30,13 @@ public class ChatMessageService {
     }
     public List<ChatMessage> findChatMessages(String senderId, String recipientId) {
         var chatId = getChatRoomId(senderId, recipientId, true);
-        var inversedchatId = getChatRoomId( recipientId,senderId, true);
-        return repository.findByChatIdOrChatId(chatId, inversedchatId);
+        return repository.findByChatId(chatId);
     }
 
     public void deleteChatMessages(String chatId) {
         List<ChatMessage> chatMessages = chatMessageRepository.findAll();
-        System.out.println("liis"+chatMessages);
         for (ChatMessage chatMessage : chatMessages) {
             if (chatMessage.getChatId().equals(chatId)) {
-                System.out.println("haha"+chatMessage);
                 chatMessageRepository.delete(chatMessage);
             }
         }
@@ -50,7 +47,9 @@ public class ChatMessageService {
         String recipientId,
         boolean createNewRoomIfNotExists
 ) {
-    var chatId = String.format("%s_%s", senderId, recipientId);
+    var first = senderId.compareTo(recipientId) < 0 ? senderId : recipientId;
+    var second = senderId.compareTo(recipientId) < 0 ? recipientId : senderId;
+    var chatId = String.format("%s_%s",first, second);
             return chatId;
 }
     

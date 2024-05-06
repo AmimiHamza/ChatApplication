@@ -39,7 +39,7 @@ let checkedUssers = [];
 
 let stompClient = null;
 let email = null;
-let fullname = null;
+let fullName = null;
 let selectedUserId = null;
 let notifiedUser = null;
 let password=null;
@@ -69,12 +69,12 @@ async function onConnected() {
     );
 
     const response = await fetch(`/user/${email}`);
-    var fullname = await response.json();
-    fullname = fullname.fullName;
+    var fullName = await response.json();
+    fullName = fullName.fullName;
 
 
 
-    document.querySelector('#connected-user-fullname').textContent = fullname;
+    document.querySelector('#connected-user-fullName').textContent = fullName;
     usernamePage.classList.add('hidden');
     chatPage.classList.remove('hidden');
     // findAndDisplayAllUsers().then();
@@ -374,7 +374,7 @@ function sendMessage(event) {
 function onLogout() {
     stompClient.send(`/app/user.disconnectUser`,
         {},
-        JSON.stringify({email: email, fullName: fullname, status: 'OFFLINE'})
+        JSON.stringify({email: email, fullName: fullName, status: 'OFFLINE'})
     );
     window.location.reload();
 }
@@ -625,7 +625,7 @@ function appendConversationElement(Conversation, AllConversationsList, functionN
     ConversationImage.alt = Conversation.fullName;
 
     const ConversationnameSpan = document.createElement('span');
-    ConversationnameSpan.textContent = Conversation.fullname;
+    ConversationnameSpan.textContent = Conversation.fullName;
 
     
 
